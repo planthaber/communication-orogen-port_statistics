@@ -9,6 +9,24 @@
  */
 
 namespace port_statistics {
+
+double statsAvgCount;
+
+struct PortDescription{
+    std::string portName;
+    std::string typeName;
+};
+
+struct PortStats{
+    PortDescription description;
+    double packetAvgKbps;
+    double packetTotal;
+    double packetFrequency;
+};
+
+//time of the last arrival of messages
+base::Time statstime;
+
 }
 
 #endif
