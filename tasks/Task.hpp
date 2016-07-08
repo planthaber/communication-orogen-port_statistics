@@ -5,6 +5,13 @@
 
 #include "port_statistics/TaskBase.hpp"
 
+using RTT::log;
+using RTT::endlog;
+using RTT::Debug;
+using RTT::Info;
+using RTT::Warning;
+using RTT::Error;
+
 namespace port_statistics{
 
     /*! \class Task
@@ -28,7 +35,8 @@ tasks/Task.cpp, and will be put in the port_statistics namespace.
     {
 	friend class TaskBase;
     protected:
-
+	RTT::types::TypeInfo* getType(::std::string const & type_name);
+	RTT::base::InputPortInterface*  createInputPort(::std::string const & port_name, ::std::string const & type_name);
 
 
     public:
