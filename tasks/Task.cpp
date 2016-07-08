@@ -6,6 +6,19 @@
 
 using namespace port_statistics;
 
+::std::vector< ::port_statistics::PortStats > Task::getStats(){
+	::std::vector< ::port_statistics::PortStats > result;
+
+	return result;
+
+}
+
+
+bool Task::printStats(){
+
+}
+
+
 RTT::types::TypeInfo* Task::getType(::std::string const & type_name){
 	/* Check if port type is known */
 	RTT::types::TypeInfoRepository::shared_ptr ti =
@@ -74,7 +87,6 @@ Task::~Task()
 }
 
 
-
 /// The following lines are template definitions for the various state machine
 // hooks defined by Orocos::RTT. See Task.hpp for more detailed
 // documentation about them.
@@ -83,8 +95,24 @@ bool Task::configureHook()
 {
     if (! TaskBase::configureHook())
         return false;
+
+    std::vector<PortDescription> config = _ports.get();
+
+    for (std::vector<PortDescription>::iterator it = config.begin(); it != config.end();++it){
+    	PortData portdata;
+    	portdata.interface = createInputPort(it->portName,it->typeName);
+    	portdata.stats.description = *it;
+    	portdata.reader = new telemetry_provider::RTTPortReader(portdata.interface, it->typeName);
+
+    	portData[it->portName] = portdata;
+    }
+
+
+
     return true;
 }
+
+
 bool Task::startHook()
 {
     if (! TaskBase::startHook())
@@ -94,6 +122,25 @@ bool Task::startHook()
 void Task::updateHook()
 {
     TaskBase::updateHook();
+
+    RTT::base::DataSourceBase::shared_ptr data;
+
+    for (std::map<std::string, PortData>::iterator port = portData.begin();port != portData.end();++port){
+    	PortData* portdata = &(port->second);
+
+        telemetry_provider::Packet packet;
+        RTT::FlowStatus flowStatus = portdata->reader->read(packet, false);
+        if( flowStatus == RTT::NewData)
+        {
+        	printf("new data port %s of type %s:\n\t size: %i\n",
+        				portdata->stats.description.portName.c_str(),
+        				portdata->stats.description.typeName.c_str(),
+        				packet.data.size()
+        				);
+    	}
+    }
+    //all ports read data;
+
 }
 void Task::errorHook()
 {

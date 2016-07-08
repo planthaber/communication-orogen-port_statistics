@@ -10,26 +10,23 @@ import_types_from "port_statisticsTypes.hpp"
 # library's pkg-config name) and then the header can be used. Following Rock
 # conventions, a common use-case would be:
 #
-# using_library "port_statistics"
+using_library "telemetry_provider"
 # import_types_from "port_statistics/CustomType.hpp"
 
 # If this project uses data types that are defined in other oroGen projects,
 # these projects should be imported there as well.
-# import_types_from "base"
+import_types_from "base"
 
 task_context "Task" do
     needs_configuration
 
     dynamic_input_port(/.*/,nil).task_trigger
     
-    property("statsAverageCount","int",5).
-        doc("use the last n messages to calculate average kbps")
-    
-    property("ports","/vector</port_statistics/PortDescription>").doc("ports to be created")
+    property("ports","/std/vector</port_statistics/PortDescription>").doc("ports to be created")
     
     operation('printStats').returns("bool").doc("print current statistics to stdout")
     
-    operation('getStats').returns("/vector</port_statistics/PortStats>").doc("print current statistics to stdout")
+    operation('getStats').returns("/std/vector</port_statistics/PortStats>").doc("print current statistics to stdout")
     
 end
 

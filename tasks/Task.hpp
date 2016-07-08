@@ -4,6 +4,7 @@
 #define PORT_STATISTICS_TASK_TASK_HPP
 
 #include "port_statistics/TaskBase.hpp"
+#include <telemetry_provider/RTTMarshalling.hpp>
 
 using RTT::log;
 using RTT::endlog;
@@ -35,9 +36,33 @@ tasks/Task.cpp, and will be put in the port_statistics namespace.
     {
 	friend class TaskBase;
     protected:
+
+    /* print current statistics to stdout
+     */
+    virtual ::std::vector< ::port_statistics::PortStats > getStats();
+
+    /* print current statistics to stdout
+     */
+    virtual bool printStats();
+
 	RTT::types::TypeInfo* getType(::std::string const & type_name);
 	RTT::base::InputPortInterface*  createInputPort(::std::string const & port_name, ::std::string const & type_name);
 
+	struct PortData{
+		 RTT::base::InputPortInterface* interface;
+		 telemetry_provider::RTTPortReader* reader;
+		 PortStats stats;
+	};
+
+	std::map<std::string, PortData> portData;
+
+
+	/**
+	 * Read the marshalled data (for the set protocol) from the port
+	 * \param marshalled_data Read marshalled data into byte vector
+	 * \param copyOldData Set to true to read the last sample from the port
+	 */
+	RTT::FlowStatus read(std::vector<uint8_t>& marshalled_data, bool copyOldData = false);
 
     public:
         /** TaskContext constructor for Task
